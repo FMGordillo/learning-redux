@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Redux lib</title>
+  </head>
+  <body>
+    <div id="counter"></div>
+    <button id="inc">Increment</button>
+    <button id="dec">Decrement</button>
+    <script src="https://unpkg.com/redux/dist/redux.js"></script>
+    <script>
+      const initialState = {
+        counter: 3
+      };
+
+      function reducer(state = {}, action) {
+        switch (action.type) {
+          case "INC":
+            return Object.assign({}, state, {
+              counter: state.counter + 1
+            });
+          case "DEC":
+            return Object.assign({}, state, {
+              counter: state.counter - 1
+            });
+          default:
+            return state;
+        }
+      }
+
+      const store = Redux.createStore(reducer, initialState);
+
+      document
+        .querySelector("#inc")
+        .addEventListener("click", () => store.dispatch({ type: "INC" }));
+      document
+        .querySelector("#dec")
+        .addEventListener("click", () => store.dispatch({ type: "DEC" }));
+
+      function updateView() {
+        document.querySelector("#counter").innerText = store.getState().counter;
+      }
+
+      store.subscribe(updateView);
+
+      updateView();
+    </script>
+  </body>
+</html>

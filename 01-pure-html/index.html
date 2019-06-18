@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Redux with Pure HTML</title>
+  </head>
+  <body>
+    <div id="counter"></div>
+    <button id="inc">Add</button>
+    <button id="dec">Remove</button>
+    <script>
+      const listeners = [];
+      let state = {
+        counter: 3
+      };
+
+      // Actions?
+      document
+        .querySelector("#inc")
+        .addEventListener("click", () => dispatch("INC"));
+      document
+        .querySelector("#dec")
+        .addEventListener("click", () => dispatch("DEC"));
+
+      function updateView() {
+        document.querySelector("#counter").innerText = state.counter;
+      }
+
+      subscribe(updateView);
+
+      // Reducer!!
+      function reducer(state = {}, action) {
+        switch (action) {
+          case "INC":
+            return Object.assign({}, state, { counter: state.counter + 1 });
+          case "DEC":
+            return Object.assign({}, state, { counter: state.counter - 1 });
+          default:
+            return state;
+        }
+      }
+
+      function dispatch(action) {
+        const newState = reducer(state, action);
+        if (newState !== state) {
+          state = newState;
+
+          listeners.forEach(listener => listener());
+        }
+      }
+
+      function subscribe(callback) {
+        listeners.push(callback);
+      }
+    </script>
+  </body>
+</html>
