@@ -6,8 +6,6 @@
 |--------------------------------------------------
 */
 
-import { createStore } from "redux";
-
 // 1)
 const initialState = {
   recipes: [{ name: "Omelette" }],
@@ -50,7 +48,7 @@ const reducer = (state, action) => {
 };
 
 // 1)
-const store = createStore(reducer, initialState);
+const store = Redux.createStore(reducer, initialState);
 window.store = store;
 
 /**
