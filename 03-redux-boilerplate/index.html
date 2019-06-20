@@ -2,9 +2,43 @@
 <html>
   <head>
     <title>The Complete Redux Book - Example Application</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
+    <h1>Recipes</h1>
+    <form id="form_new_recipe">
+      <h2>Add a new Recipe</h2>
+      <label for="recipe_name">Recipe name</label>
+      <input
+        id="recipe_name"
+        type="text"
+        name="recipe_name"
+        placeholder="Recipe name"
+      />
+      <input type="submit" value="Add recipe" />
+    </form>
+    <form id="form_new_ingredient">
+      <h2>Add a new Ingredient</h2>
+      <label for="ingredient_name">Recipe name</label>
+      <input
+        id="ingredient_name"
+        type="text"
+        name="ingredient_name"
+        placeholder="Ingredient name"
+      />
+      <label for="quantity">Quantity</label>
+      <input
+        id="quantity"
+        type="number"
+        name="quantity"
+        placeholder="Quantity"
+      />
+      <label for="recipe">Recipe</label>
+      <input id="recipe" type="text" name="recipe" placeholder="Recipe" />
+      <input type="submit" value="Add ingredient" />
+    </form>
+    <hr />
     <script type="text/javascript" src="app.js"></script>
   </body>
 </html>
