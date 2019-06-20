@@ -24,31 +24,40 @@ const initialState = {
 };
 
 // 1)
-const reducer = (state, action) => {
+
+const recipesReducer = (recipes = [], action) => {
   switch (action.type) {
     case "ADD_RECIPE":
-      return Object.assign({}, state, {
-        recipes: state.recipes.concat({ name: action.name })
-      });
-    case "ADD_INGREDIENT":
-      return Object.assign({}, state, {
-        ingredients: state.ingredients.concat({
-          recipe: action.recipe,
-          name: action.name,
-          quantity: action.quantity
-        })
-      });
-    case "REMOVE_INGREDIENT":
-      return state;
-    case "REMOVE_RECIPE":
-      return state;
+      return recipes.concat({ name: action.name });
+
     default:
-      return state;
+      return recipes;
   }
 };
 
+const ingredientsReducer = (ingredients = [], action) => {
+  switch (action.type) {
+    case "ADD_INGREDIENT":
+      return ingredients.concat({
+        recipe: action.recipe,
+        name: action.name,
+        quantity: action.quantity
+      });
+
+    default:
+      return ingredients;
+  }
+};
+
+const rootReducer = (state, action) => {
+  return Object.assign({}, state, {
+    recipes: recipesReducer(state.recipes, action),
+    ingredients: ingredientsReducer(state.ingredients, action)
+  });
+};
+
 // 1)
-const store = Redux.createStore(reducer, initialState);
+const store = Redux.createStore(rootReducer, initialState);
 window.store = store;
 
 /**
