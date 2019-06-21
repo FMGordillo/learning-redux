@@ -60,6 +60,24 @@ const rootReducer = (state, action) => {
 const store = Redux.createStore(rootReducer, initialState);
 window.store = store;
 
+function updateSelectUI() {
+  // First, fill out the options:
+  const recipesEl = document.querySelector("#recipe");
+  while (recipesEl.firstChild) {
+    recipesEl.removeChild(recipesEl.firstChild);
+  }
+  const option = document.createElement("option");
+  option.value = "";
+  option.innerText = "Select an option";
+  recipesEl.appendChild(option);
+  store.getState().recipes.forEach(recipe => {
+    const option = document.createElement("option");
+    option.value = recipe.name;
+    option.innerText = recipe.name;
+    recipesEl.appendChild(option);
+  });
+}
+
 /**
  * 2)
  * Magic without JQuery, sry.
@@ -67,6 +85,7 @@ window.store = store;
 function updateUI() {
   const bodyEl = document.querySelector("body");
 
+  updateSelectUI();
   // If it's first render, don't do nothing
   if (document.querySelector("#app")) {
     bodyEl.removeChild(document.querySelector("#app"));
