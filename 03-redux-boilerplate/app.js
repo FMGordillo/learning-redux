@@ -57,8 +57,17 @@ const rootReducer = Redux.combineReducers({
   ingredients: ingredientsReducer
 });
 
+const logMiddleware = ({ getState, dispatch }) => next => action => {
+  console.log(`Action: ${action.type}`);
+  next(action);
+};
+
 // 1)
-const store = Redux.createStore(rootReducer, initialState);
+const store = Redux.createStore(
+  rootReducer,
+  initialState,
+  Redux.applyMiddleware(logMiddleware)
+);
 window.store = store;
 
 function updateSelectUI() {
