@@ -1,12 +1,14 @@
 /**
 |--------------------------------------------------
-| 1) Init the store
-| 2) Create generic function to generate UI for each change
-| 3) Create action creators and use them
+| First, let's set up:
+| - initialState
+| - Constants for the Actions
+| - Reducers (and combine them)
+| - Middlewares
+| - Create the store 🏪
 |--------------------------------------------------
 */
 
-// 1)
 const initialState = {
   recipes: [{ name: "Omelette" }],
   ingredients: [
@@ -24,15 +26,18 @@ const initialState = {
 };
 
 const ADD_RECIPE = "ADD_RECIPE";
+const FETCH_RECIPES = "FETCH_RECIPES"; // loading: true
+const SET_RECIPES = "SET_RECIPES"; // loading: false
 const ADD_INGREDIENT = "ADD_INGREDIENT";
-
-// 1)
+const FETCH_INGREDIENTS = "FETCH_INGREDIENTS"; // loading: true
+const SET_INGREDIENTS = "SET_INGREDIENTS"; // loading: false
 
 const recipesReducer = (recipes = [], action) => {
   switch (action.type) {
     case ADD_RECIPE:
       return recipes.concat({ name: action.name });
-
+    case SET_RECIPES:
+      return action.recipes;
     default:
       return recipes;
   }
@@ -46,7 +51,8 @@ const ingredientsReducer = (ingredients = [], action) => {
         name: action.name,
         quantity: action.quantity
       });
-
+    case SET_INGREDIENTS:
+      return action.ingredients;
     default:
       return ingredients;
   }
@@ -57,18 +63,41 @@ const rootReducer = Redux.combineReducers({
   ingredients: ingredientsReducer
 });
 
-const logMiddleware = ({ getState, dispatch }) => next => action => {
+const apiMiddleware = ({ dispatch }) => next => action => {
+  if (action.type === FETCH_RECIPES) {
+    window.fetchData(
+      "https://s3.amazonaws.com/500tech-shared/db.json",
+      ({ data }) => dispatch(setRecipes(data.recipes))
+    );
+  }
+  if (action.type === FETCH_INGREDIENTS) {
+    window.fetchData(
+      "https://s3.amazonaws.com/500tech-shared/db.json",
+      ({ data }) => dispatch(setIngredients(data.ingredients))
+    );
+  }
+  next(action);
+};
+
+const logMiddleware = () => next => action => {
   console.log(`Action: ${action.type}`);
   next(action);
 };
 
-// 1)
 const store = Redux.createStore(
   rootReducer,
   initialState,
-  Redux.applyMiddleware(logMiddleware)
+  Redux.applyMiddleware(logMiddleware, apiMiddleware)
 );
 window.store = store;
+
+/**
+|--------------------------------------------------
+| Then, we need to show this wonder to the world:
+| - Create two functions to update certain parts
+| - subscribe() to the changes in the state
+|--------------------------------------------------
+*/
 
 function updateSelectUI() {
   // First, fill out the options:
@@ -88,14 +117,9 @@ function updateSelectUI() {
   });
 }
 
-/**
- * 2)
- * Magic without JQuery, sry.
- */
 function updateUI() {
   const bodyEl = document.querySelector("body");
 
-  updateSelectUI();
   // If it's first render, don't do nothing
   if (document.querySelector("#app")) {
     bodyEl.removeChild(document.querySelector("#app"));
@@ -125,11 +149,19 @@ function updateUI() {
   bodyEl.appendChild(container);
 }
 
-// 2) first update
 updateUI();
+updateSelectUI();
+store.subscribe(updateSelectUI);
 store.subscribe(updateUI);
 
-// 3)
+/**
+|--------------------------------------------------
+| Now, we have to attach UI and the Actions
+| - Make Action Creators
+| - Attach them to dispatch()
+|--------------------------------------------------
+*/
+
 const addRecipe = name => ({
   type: ADD_RECIPE,
   name
@@ -139,6 +171,24 @@ const addIngredient = (name, quantity, recipe) => ({
   recipe,
   name,
   quantity
+});
+
+const fetchRecipes = () => ({
+  type: FETCH_RECIPES
+});
+
+const setRecipes = recipes => ({
+  type: SET_RECIPES,
+  recipes
+});
+
+const fetchIngredients = () => ({
+  type: FETCH_INGREDIENTS
+});
+
+const setIngredients = ingredients => ({
+  type: SET_INGREDIENTS,
+  ingredients
 });
 
 // 3)
@@ -151,4 +201,12 @@ document.querySelector("#form_new_ingredient").addEventListener("submit", e => {
   e.preventDefault();
   const [{ value: name }, { value: quantity }, { value: recipe }] = e.target;
   store.dispatch(addIngredient(name, quantity, recipe));
+});
+
+// TEST
+document.querySelector("#getRecipes").addEventListener("click", () => {
+  store.dispatch({ type: FETCH_RECIPES });
+});
+document.querySelector("#getIngredients").addEventListener("click", () => {
+  store.dispatch({ type: FETCH_INGREDIENTS });
 });
