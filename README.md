@@ -8,6 +8,6 @@
 
 [See project HERE](02-html-and-redux)
 
-## 1- Recipes and ingredients (HTML + JS)
+## 3- Recipes and ingredients (HTML + JS)
 
 [See project HERE](03-redux-boilerplate)
