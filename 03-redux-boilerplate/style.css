@@ -20,7 +20,7 @@ input:not([type="submit"]) {
   background: rgb(0, 0, 0);
 }
 ::placeholder {
-  color: #dddbf1;
+  color: #a1a0ad;
 }
 
 input[type="submit"] {

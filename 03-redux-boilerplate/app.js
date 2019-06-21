@@ -23,11 +23,14 @@ const initialState = {
   ]
 };
 
+const ADD_RECIPE = "ADD_RECIPE";
+const ADD_INGREDIENT = "ADD_INGREDIENT";
+
 // 1)
 
 const recipesReducer = (recipes = [], action) => {
   switch (action.type) {
-    case "ADD_RECIPE":
+    case ADD_RECIPE:
       return recipes.concat({ name: action.name });
 
     default:
@@ -37,7 +40,7 @@ const recipesReducer = (recipes = [], action) => {
 
 const ingredientsReducer = (ingredients = [], action) => {
   switch (action.type) {
-    case "ADD_INGREDIENT":
+    case ADD_INGREDIENT:
       return ingredients.concat({
         recipe: action.recipe,
         name: action.name,
@@ -49,12 +52,10 @@ const ingredientsReducer = (ingredients = [], action) => {
   }
 };
 
-const rootReducer = (state, action) => {
-  return Object.assign({}, state, {
-    recipes: recipesReducer(state.recipes, action),
-    ingredients: ingredientsReducer(state.ingredients, action)
-  });
-};
+const rootReducer = Redux.combineReducers({
+  recipes: recipesReducer,
+  ingredients: ingredientsReducer
+});
 
 // 1)
 const store = Redux.createStore(rootReducer, initialState);
@@ -121,11 +122,11 @@ store.subscribe(updateUI);
 
 // 3)
 const addRecipe = name => ({
-  type: "ADD_RECIPE",
+  type: ADD_RECIPE,
   name
 });
 const addIngredient = (name, quantity, recipe) => ({
-  type: "ADD_INGREDIENT",
+  type: ADD_INGREDIENT,
   recipe,
   name,
   quantity
