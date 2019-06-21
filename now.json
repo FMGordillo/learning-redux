@@ -1,4 +1,5 @@
 {
 	"version": 2,
-	"name": "learning-redux"
+	"name": "learning-redux",
+	"alias": ["learning-redux", "learning-redux.facundogordillo.com]
 }
