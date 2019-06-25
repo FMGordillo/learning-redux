@@ -9,21 +9,23 @@
 |--------------------------------------------------
 */
 
-const initialState = {
-  recipes: [{ name: "Omelette" }],
-  ingredients: [
-    {
-      recipe: "Omelette",
-      name: "Egg",
-      quantity: 2
-    },
-    {
-      recipe: "Omelette",
-      name: "Patience",
-      quantity: 2000
-    }
-  ]
-};
+// UPDATE: Use localStorage instead!
+//
+// const initialState = {
+//   recipes: [{ name: "Omelette" }],
+//   ingredients: [
+//     {
+//       recipe: "Omelette",
+//       name: "Egg",
+//       quantity: 2
+//     },
+//     {
+//       recipe: "Omelette",
+//       name: "Patience",
+//       quantity: 2000
+//     }
+//   ]
+// };
 
 const ADD_RECIPE = "ADD_RECIPE";
 const FETCH_RECIPES = "FETCH_RECIPES"; // loading: true
@@ -31,6 +33,7 @@ const SET_RECIPES = "SET_RECIPES"; // loading: false
 const ADD_INGREDIENT = "ADD_INGREDIENT";
 const FETCH_INGREDIENTS = "FETCH_INGREDIENTS"; // loading: true
 const SET_INGREDIENTS = "SET_INGREDIENTS"; // loading: false
+const CLEAR_ALL = "CLEAR_ALL";
 
 const recipesReducer = (recipes = [], action) => {
   switch (action.type) {
@@ -58,10 +61,17 @@ const ingredientsReducer = (ingredients = [], action) => {
   }
 };
 
-const rootReducer = Redux.combineReducers({
+const appReducer = Redux.combineReducers({
   recipes: recipesReducer,
   ingredients: ingredientsReducer
 });
+
+const rootReducer = (state, action) => {
+  if (action.type === CLEAR_ALL) {
+    state = undefined;
+  }
+  return appReducer(state, action);
+};
 
 const apiMiddleware = ({ dispatch }) => next => action => {
   if (action.type === FETCH_RECIPES) {
@@ -84,10 +94,30 @@ const logMiddleware = () => next => action => {
   next(action);
 };
 
+const localStorageEnhancer = next => (reducer, initialState, enhancer) => {
+  const LOCAL_STORAGE_KEY = "@@FMG-Recipes";
+  let store;
+
+  const preloadedState =
+    initialState || JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY) || {});
+
+  // TODO: How do i handle initialState from API?
+
+  store = next(reducer, preloadedState, enhancer);
+
+  store.subscribe(() =>
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(store.getState()))
+  );
+
+  return store;
+};
+
 const store = Redux.createStore(
   rootReducer,
-  initialState,
-  Redux.applyMiddleware(logMiddleware, apiMiddleware)
+  Redux.compose(
+    Redux.applyMiddleware(logMiddleware, apiMiddleware),
+    localStorageEnhancer
+  )
 );
 window.store = store;
 
@@ -191,6 +221,10 @@ const setIngredients = ingredients => ({
   ingredients
 });
 
+const cleanAll = () => ({
+  type: CLEAR_ALL
+});
+
 // 3)
 document.querySelector("#form_new_recipe").addEventListener("submit", e => {
   e.preventDefault();
@@ -209,4 +243,7 @@ document.querySelector("#getRecipes").addEventListener("click", () => {
 });
 document.querySelector("#getIngredients").addEventListener("click", () => {
   store.dispatch({ type: FETCH_INGREDIENTS });
+});
+document.querySelector("#clearAll").addEventListener("click", () => {
+  store.dispatch({ type: CLEAR_ALL });
 });
