@@ -11,3 +11,7 @@
 ## 3- Recipes and ingredients (HTML + JS)
 
 [See project HERE](03-redux-boilerplate)
+
+## 4- Store, HOC, Observables, and moar (HTML + JS)
+
+[See project HERE](04-moar-store)
